@@ -1,0 +1,9 @@
+﻿  FatalProjectMain.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(464,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(642,15): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(644,43): warning C4244: '+=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(986,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(217): warning C4172: returning address of local variable or temporary: pos
+  FatalProject.vcxproj -> C:\Users\sonic\Desktop\ProjectFatal\FatalProject\Debug\FatalProject.exe

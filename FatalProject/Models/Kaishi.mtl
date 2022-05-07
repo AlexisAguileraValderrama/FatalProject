@@ -1,0 +1,35 @@
+# Blender MTL File: 'Kaishi Template1.blend'
+# Material Count: 3
+
+newmtl Armor
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 0.128580 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\sonic\\Desktop\\VisualStudioProjects\\P6\\P6\\Textures\\Armor Texture.png
+
+newmtl Eyes_Texture
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\sonic\\Desktop\\VisualStudioProjects\\P6\\P6\\Textures\\Eyes Texture.png
+
+newmtl Squeleton_Texture_Material
+Ns 579.970110
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\sonic\\Desktop\\VisualStudioProjects\\P6\\P6\\Textures\\Squeleton Texture.png
