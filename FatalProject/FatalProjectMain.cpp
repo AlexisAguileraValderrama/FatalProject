@@ -54,9 +54,20 @@ Texture PistaVoxTexture;
 Model Terreno;
 Model Casa;
 Model Lampara;
+Model LamparaTori;
 Model Valla;
 Model Tori;
 Model Tumba;
+
+
+Model Doll;
+Model Oni;
+Model LamparaPapel;
+
+Model Zombie;
+Model Rope;
+Model Poste;
+
 
 Texture ArbolTexture[3];
 
@@ -79,7 +90,21 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-float timeAC = 0, posz = 0, posx = 0;
+////////Evento 1/////////////
+
+float timeAC = 0, posz = 0, posx = 0, poszA = 0, posxA = 0, posy = 0, vel = 0, ang = 0;
+
+float intensityFloor = 0.2f;
+float intensityOni = 0.0f;
+float intensityThree = 0.0f;
+
+
+
+///////Variables evento 2///////////////
+
+float angCuerdas = 0;
+glm::vec3 posZombie = glm::vec3(-20.604f, 5.3777f, 77.374f);
+float angZombie = 0;
 
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -88,6 +113,9 @@ GLuint uniformColor = 0;
 glm::mat4 model(1.0);
 glm::mat4 modelaux(1.0);
 glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+
+//Luces
 
 
 // Vertex Shader
@@ -423,39 +451,150 @@ std::vector<float> coefzSn = { -4.7800148e-14f,
 
 
 
-void evento1() {
-	//2
+int evento1(int seq) {
 
-	model = glm::mat4(1.0);
+	switch (seq) {
+		case 0:
+			intensityFloor = 0.0f;
+			intensityOni = 0.5;
+			intensityThree = 3.0;
+			posx = 0;
+			posz = 109.15f;
+			posy = -1.3f;
+			vel = 20.0f;
+			
+			return 1;
+		case 1:
 
-	float* p;
+			color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	p = Fourier(coefzCn, coefzSn, coefxCn, coefxSn, timeAC, 40);
+			modelaux = glm::mat4(1.0);
 
-	posz = *p;
-	posx = *(p + 1);
+			model = glm::mat4(1.0);
+			model = glm::translate(model, glm::vec3(-posx,
+				posy,
+				posz));
 
-	//ang = AngleOf2(glm::vec2(posxA, poszA), glm::vec2(posx, posz));
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+			glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+			Doll.RenderModel();
 
-	///Para vuelta////
-	///Jerarquización de carro descargado///////////////////////
+			posy += 0.005f * deltaTime;
 
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
+			if (posy >= 1.5f) {
+				timeAC = 0;
+				return 2;
+			}
+			else {
+				return 1;
+			}
 
-	modelaux = glm::mat4(1.0);
+		case 2:
 
-	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(-posx,
-		2.0f,
-		posz));
+			timeAC += deltaTime;
 
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-	Tumba.RenderModel();
+			model = glm::mat4(1.0);
+
+			float* p;	
+
+			p = Fourier(coefzCn, coefzSn, coefxCn, coefxSn, timeAC, vel);
+
+			posz = *p;
+			posx = *(p + 1);
+
+			ang = AngleOf2(glm::vec2(posxA, poszA), glm::vec2(posx, posz));
+
+			///Para vuelta////
+			///Jerarquización de carro descargado///////////////////////
+
+			color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+			modelaux = glm::mat4(1.0);
+
+			model = glm::mat4(1.0);
+			model = glm::translate(model, glm::vec3(-posx,
+				posy,
+				posz));
+
+			model = glm::rotate(model, -ang, glm::vec3(0.0f, 1.0f, 0.0f));
+
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+			glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+			Doll.RenderModel();
+
+			posxA = posx;
+			poszA = posz;
+
+
+
+			if (timeAC > coefzCn.size()*2*vel) {
+				posx = 0;
+				posz = 109.15f;
+				posy = 1.5f;
+				return 3;
+			}
+			else {
+				return 2;
+			}
+		case 3:
+			color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+			modelaux = glm::mat4(1.0);
+
+			model = glm::mat4(1.0);
+			model = glm::translate(model, glm::vec3(-posx,
+				posy,
+				posz));
+
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+			glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+			Doll.RenderModel();
+
+			posy -= 0.005f * deltaTime;
+
+			if (posy <= -1.3f) {
+				timeAC = 0;
+				intensityOni = 0.0;
+				intensityThree = 0.0;
+				intensityFloor = 0.2f;
+				return -1;
+			}
+			else {
+				return 3;
+			}
+	}
 }
 
-void evento2() {
-	std::cout << "Hola soy 2\n";
+int evento2(int seq) {
+	switch (seq)
+	{
+
+	case 0:
+
+		angCuerdas = 0;
+		angZombie = 0;
+		posZombie = glm::vec3(-20.604f, 5.3777f, 77.374f);
+
+		return 1;
+
+	case 1:
+
+		if (angCuerdas > -70.0f) {
+			angCuerdas -= 1.5f * deltaTime;
+		}
+
+		posZombie -= glm::vec3(0.0,0.3*deltaTime,0.0f);
+
+		angZombie += 1.7f * deltaTime;
+
+		if (posZombie.y > -40.0f) {
+			return 1;
+		}
+		else {
+			return -1;
+		}
+
+	}
 }
 
 
@@ -469,7 +608,7 @@ int main()
 	eventManager = EventManager();
 
 	eventManager.AddEvent(0, 110, &evento1);
-	eventManager.AddEvent(1, 1, &evento2);
+	eventManager.AddEvent(-14, 68, &evento2);
 
 	CreateObjects();
 	CreateShaders();
@@ -495,6 +634,29 @@ int main()
 
 	Tumba = Model();
 	Tumba.LoadModel("Models/Grave.obj");
+
+	Doll = Model();
+	Doll.LoadModel("Models/Doll.obj");
+
+	LamparaPapel = Model();
+	LamparaPapel.LoadModel("Models/FlorLamp.obj");
+
+	Oni = Model();
+	Oni.LoadModel("Models/Oni.obj");
+
+
+	Zombie = Model();
+	Zombie.LoadModel("Models/ZombieRope.obj");
+
+	Rope = Model();
+	Rope.LoadModel("Models/Rope.obj");
+
+	Poste = Model();
+	Poste.LoadModel("Models/WoodenPost.obj");
+
+	LamparaTori = Model();
+	LamparaTori.LoadModel("Models/LampRojo.obj");
+
 
 	ArbolTexture[0] = Texture("Textures/ArbolTexture.png");
 	ArbolTexture[0].LoadTextureA();
@@ -523,83 +685,166 @@ int main()
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.6f, 0.6f,
+		0.2f, 0.2f,
 		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
 
-	//Luz de totem
-	pointLights[0] = PointLight(1.0f, 0.3f, 0.0f,
-		1.0f, 1.0f,
+	//Luces de lamparas
+	
+	pointLights[0] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
 		2.0f, 1.5f, 1.5f,
 		0.1f, 0.2f, 0.1f);
 	pointLightCount++;
 
+	pointLights[1] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[2] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[3] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[4] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[5] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[6] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[7] = PointLight(1.0f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	//Lamparas de piso
+	pointLights[8] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[9] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[10] = PointLight(1.0f, 0.0f, 0.1f,
+		0.5f, 0.5f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+
 	unsigned int spotLightCount = 0;
 
-	//luz de helicóptero
-
-	//luz fija
-	spotLights[0] = SpotLight(1.0f, 1.0f, 0.0f,
-		1.0f, 20.0f,
-		5.0f, 10.0f, 0.0f,
-		-0.6f, -0.5f, 0.0f,
-		0.3f, 0.2f, 0.1f,
-		60.0f);
-	spotLightCount++;
-
-	//luz fija
-	spotLights[1] = SpotLight(1.0f, 1.0f, 0.0f,
-		1.0f, 20.0f,
-		5.0f, 10.0f, 0.0f,
-		-0.6f, -0.5f, 0.0f,
-		0.3f, 0.2f, 0.1f,
-		60.0f);
-	spotLightCount++;
-
-	//luz fija azul
-	spotLights[2] = SpotLight(0.2f, 0.6f, 0.3f,
-		30.0f, 30.0f,
-		5.0f, 10.0f, 0.0f,
-		0.0f, -0.5f, -0.5f,
-		0.01f, 0.02f, 0.01f,
-		30.0f);
-	spotLightCount++;
-
-	//linterna de mano
-	spotLights[3] = SpotLight(1.0f, 1.0f, 1.0f,
-		1.0f, 0.5f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
-		0.01f, 0.02f, 0.01f,
-		50.0f);
-	spotLightCount++;
-
-	//luz trasera
-	spotLights[4] = SpotLight(1.0f, 0.0f, 0.0f,
-		1.0f, 20.0f,
-		5.0f, 10.0f, 0.0f,
-		0.6f, -0.5f, 0.0f,
-		0.3f, 0.2f, 0.1f,
-		60.0f);
-	spotLightCount++;
-
-	//luz trasera
-	spotLights[5] = SpotLight(1.0f, 0.0f, 0.0f,
-		1.0f, 20.0f,
-		5.0f, 10.0f, 0.0f,
-		0.6f, -0.5f, 0.0f,
-		0.3f, 0.2f, 0.1f,
-		60.0f);
-	spotLightCount++;
 
 	//linterna global
-	spotLights[6] = SpotLight(1.0f, 1.0f, 1.0f,
+	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
 		2.0f, 1.0f,
 		0.0f, 0.0f, 0.0f,
 		0.0f, -1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		5.0f);
+	spotLightCount++;
+
+	//Lampara tori
+
+	spotLights[1] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[2] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[3] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[4] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[5] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[6] = SpotLight(1.0f, 0.3f, 0.0f,
+		10.0f, 10.0f,
+		5.0f, 10.0f, 0.0f,
+		0.0f, -0.5f, -0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	//Luces de invocacion
+	spotLights[7] = SpotLight(1.0f, 0.3f, 0.0f,
+		3.0f, 3.0f,
+		1.781f, 4.0f, 109.0f,
+		-0.5f, -0.5f, 0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[8] = SpotLight(1.0f, 0.3f, 0.0f,
+		3.0f, 3.0f,
+		-1.781f, 4.0f, 109.0f,
+		0.5f, -0.5f, 0.0f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[9] = SpotLight(0.4f, 0.3f, 0.6f,
+		3.0f, 3.0f,
+		0.0f, 4.0f, 111.0f,
+		0.0f, -0.5f, -0.5f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
 	spotLightCount++;
 
 	//Luz de totem
@@ -644,12 +889,6 @@ int main()
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
-		timeAC += deltaTime;
-
-		if (timeAC > 100000) {
-			timeAC = 0;
-		}
-
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
@@ -673,12 +912,12 @@ int main()
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		eventManager.Update();
+		eventManager.Update(mainWindow.getAction(), camera.getCameraPosition());
 
 		// luz ligada a la cámara de tipo flash
 		glm::vec3 lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
-		spotLights[6].SetFlash(lowerLight, camera.getCameraDirection());
+		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 		
 
 		//información al shader de fuentes de iluminación
@@ -689,9 +928,9 @@ int main()
 		////////////Terreno///////
 
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0));
-		model = glm::scale(model, glm::vec3(1.5f, 2.0f, 1.5f));
-		//model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Terreno.RenderModel();
@@ -744,95 +983,167 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Casa.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(2.2477f, 1.2448f, 112.11f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[8].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[8].SetIntensity(intensityFloor);
+
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-2.2477f, 1.2448f, 112.11f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[9].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[9].SetIntensity(intensityFloor);
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(0.0f, 1.6328f, 113.87f));
+		modelaux = model;
+		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Oni.RenderModel();
+
+		pointLights[10].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1], modelaux[3][2] + 0.5f));
+		pointLights[10].SetIntensity(intensityOni);
+
+		spotLights[7].SetIntensity(intensityThree, intensityThree);
+		spotLights[8].SetIntensity(intensityThree, intensityThree);
+		spotLights[9].SetIntensity(intensityThree, intensityThree);
+
 
 		//////////////Lamparas///////////////////
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(14.766f, 0.9745f, 16.455f));
+
+		modelaux = model;
+
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[0].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		/////1
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(14.766f, 0.9745f, 33.642f));
+		modelaux = model;
+
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[1].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 		
 		/////2
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(14.766f, 0.9745f, 58.161f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[2].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		/////3
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(14.766f, 0.9745f, 75.65f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
 
+		pointLights[3].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+
+
 		/////4
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(9.158f, 0.9745f, 95.79f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
 
+		pointLights[4].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		/////5
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(-9.158f, 0.9745f, 95.79f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[5].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		/////6
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(-13.749f, 0.9745f, 55.046f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[6].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		/////7
 
 		model = glm::mat4(1.0);
 
 		model = glm::translate(model, glm::vec3(-13.749f, 0.9745f, 37.911f));
+		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Lampara.RenderModel();
+
+		pointLights[7].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
 
 		////////////////////Tori////////////////
 
@@ -846,6 +1157,34 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Tori.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(3.7151f, 5.0371f, 34.442f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[1].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+								glm::vec3(0.0, -1.0f, 0.0f));
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-3.7151f, 5.0371f, 34.442f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[2].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+			glm::vec3(0.0, -1.0f, 0.0f));
+
+
+
 		//1
 		model = glm::mat4(1.0);
 
@@ -856,6 +1195,34 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Tori.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(3.7151f, 5.0371f, 56.838f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[3].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+			glm::vec3(0.0, -1.0f, 0.0f));
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-3.7151f, 5.0371f, 56.838f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[4].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+			glm::vec3(0.0, -1.0f, 0.0f));
+
+
+
 		//2
 		model = glm::mat4(1.0);
 
@@ -865,6 +1232,32 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Tori.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(3.7151f, 5.0371f, 76.158f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[5].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+			glm::vec3(0.0, -1.0f, 0.0f));
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-3.7151f, 5.0371f, 76.158f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaTori.RenderModel();
+
+		spotLights[6].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
+			glm::vec3(0.0, -1.0f, 0.0f));
 
 		////////////////////Valla////////////////
 
@@ -999,8 +1392,88 @@ int main()
 			glDisable(GL_BLEND);
 		}
 
+		/////////////Sacrificio////////////
 
-		////////////Oni///////////
+
+		//Postes
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-10.849f, 0.8745f, 77.491f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Poste.RenderModel();
+
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-26.568f, 0.8745f, 69.666f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Poste.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-26.751f, 0.8745f, 84.622f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Poste.RenderModel();
+
+		//Cuerdas
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-11.281f, 10.493f, 77.479f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Rope.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-26.554f, 10.493f, 84.115f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 50 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Rope.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-26.277f, 10.493f, 70.051f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, -52 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Rope.RenderModel();
+
+		//Zombie
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, posZombie);
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		model = glm::rotate(model, angZombie * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Zombie.RenderModel();
 
 		
 

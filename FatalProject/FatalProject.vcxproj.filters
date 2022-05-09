@@ -21,9 +21,6 @@
     <ClCompile Include="DirectionalLight.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="FatalProjectMain.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -58,6 +55,9 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="Event.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FatalProjectMain.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

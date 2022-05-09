@@ -43,6 +43,7 @@ void PointLight::SetPos(glm::vec3 pos)
 void PointLight::SetIntensity(GLfloat intensity)
 {
 	ambientIntensity = intensity;
+	diffuseIntensity = intensity;
 }
 
 PointLight::~PointLight()

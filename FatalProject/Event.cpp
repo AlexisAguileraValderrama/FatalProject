@@ -1,7 +1,7 @@
 #include "Event.h"
 
 
-Event::Event(int x, int z, void (*evento)())
+Event::Event(int x, int z, int (*evento)(int))
 {
 	pos = glm::vec3(x, 0, z);
 	this->evento = evento;
@@ -10,7 +10,9 @@ Event::Event(int x, int z, void (*evento)())
 
 void Event::Iterate()
 {
-	evento();
+	
+	currentSeq = evento(currentSeq);
+	if (currentSeq == -1) Stop();
 }
 
 void Event::Start()
@@ -18,3 +20,9 @@ void Event::Start()
 	isRunning = true;
 	currentSeq = 0;
 }
+
+void Event::Stop()
+{
+	isRunning = false;
+}
+

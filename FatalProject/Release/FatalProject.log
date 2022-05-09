@@ -1,0 +1,13 @@
+﻿  FatalProjectMain.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(536,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(714,15): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(716,43): warning C4244: '+=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1052,21): warning C4018: '<': signed/unsigned mismatch
+  Generating code
+  1 of 1220 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    7 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  FatalProject.vcxproj -> C:\Users\sonic\Desktop\ProjectFatal\FatalProject\Release\FatalProject.exe

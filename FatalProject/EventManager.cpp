@@ -8,7 +8,7 @@
 EventManager::EventManager()
 {
 
-	actionState = false;
+	lastActionState = false;
 
 }
 
@@ -16,24 +16,34 @@ EventManager::~EventManager()
 {
 }
 
-void EventManager::AddEvent(int x, int z, void (*evento)())
+void EventManager::AddEvent(int x, int z, int (*evento)(int))
 {
 
-	Event eve(x,z,evento);
+	Event* eve = new Event(x, z, evento);
 
-	eventos.push_back(eve);
+	eventos.push_back(*eve);
 
 }
 
-void  EventManager::Update(Window mainWindow, Camera camera) {
+void EventManager::AddAction(int x, int z, int numActions, int (*evento)(int))
+{
+
+	Event* eve = new Event(x,z,evento);
+
+	actions.push_back(*eve);
+
+}
+
+
+
+void  EventManager::Update(bool actionSate, glm::vec3 playerPos) {
 
 	float dist = 0;
-	glm::vec3 playerpos (camera.getCameraPosition().z);
 
-	if (mainWindow.getAction() != actionState) {
-		for (Event e : eventos) {
-		
-			dist = glm::distance(playerpos, e.pos);
+	if (actionSate != lastActionState) {
+		for (Event& e : eventos) {
+
+			dist = glm::distance(playerPos, e.pos);
 
 			if (dist < 5.0f && !e.isRunning) {
 				e.Start();
@@ -42,7 +52,14 @@ void  EventManager::Update(Window mainWindow, Camera camera) {
 
 	}
 
-	actionState = mainWindow.getAction();
+	for (Event& e : eventos) {
+
+		if (e.isRunning) {
+			e.Iterate();
+		}
+	}
+
+	lastActionState = actionSate;
 
 
 }

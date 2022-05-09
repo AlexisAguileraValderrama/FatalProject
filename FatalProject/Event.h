@@ -5,16 +5,17 @@ class Event
 {
 public:
 
-	Event(int x, int z, void (*evento)());
+	Event(int x, int z, int (*evento)(int));
 	void Start();
+	void Stop();
 	void Iterate();
 
-	int currentSeq;
+	int currentSeq = 0;
 
-	bool isRunning;
+	bool isRunning = false;
 
 	glm::vec3 pos;
-	void (*evento)();
+	int (*evento)(int);
 
 private:
 
