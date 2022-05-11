@@ -51,6 +51,11 @@ void SpotLight::SetPos(glm::vec3 pos)
 	position = pos;
 }
 
+void SpotLight::SetColor(glm::vec3 colorRGB)
+{
+	color = colorRGB;
+}
+
 void SpotLight::SetIntensity(GLfloat aintensity, GLfloat dIntensity)
 {
 	ambientIntensity = aintensity;

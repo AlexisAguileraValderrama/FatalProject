@@ -28,7 +28,7 @@ void EventManager::AddEvent(int x, int z, int (*evento)(int))
 void EventManager::AddAction(int x, int z, int numActions, int (*evento)(int))
 {
 
-	Event* eve = new Event(x,z,evento);
+	Event* eve = new Event(x,z,numActions,evento);
 
 	actions.push_back(*eve);
 
@@ -50,6 +50,15 @@ void  EventManager::Update(bool actionSate, glm::vec3 playerPos) {
 			}
 		}
 
+		for (Event& e : actions) {
+
+			dist = glm::distance(playerPos, e.pos);
+
+			if (dist < 5.0f && !e.isRunning) {
+				e.NextAction();
+			}
+		}
+
 	}
 
 	for (Event& e : eventos) {
@@ -57,6 +66,10 @@ void  EventManager::Update(bool actionSate, glm::vec3 playerPos) {
 		if (e.isRunning) {
 			e.Iterate();
 		}
+	}
+
+	for (Event& e : actions) {
+			e.Iterate();
 	}
 
 	lastActionState = actionSate;

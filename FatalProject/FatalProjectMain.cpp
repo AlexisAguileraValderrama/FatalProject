@@ -30,6 +30,7 @@ Práctica 5: Carga de Modelos
 #include "Skybox.h"
 
 #include "EventManager.h"
+#include "ObjetosFlotantes.h"
 
 //para iluminación
 #include "CommonValues.h"
@@ -49,8 +50,6 @@ Camera camera;
 
 EventManager eventManager;
 
-Texture PistaVoxTexture;
-
 Model Terreno;
 Model Casa;
 Model Lampara;
@@ -58,6 +57,7 @@ Model LamparaTori;
 Model Valla;
 Model Tori;
 Model Tumba;
+Model Mausoleo;
 
 
 Model Doll;
@@ -68,9 +68,20 @@ Model Zombie;
 Model Rope;
 Model Poste;
 
+Model Desktop;
+Model Vodoo;
+Model Walls;
+Model Door;
+Model Ghost;
+Model Chest;
+Model ChestTape;
+
+Model objetos[5];
+std::vector<ObjetosFlotantes> flotantes;
+
 
 Texture ArbolTexture[3];
-
+Texture KanjiTexture;
 
 Skybox skybox;
 
@@ -98,7 +109,19 @@ float intensityFloor = 0.2f;
 float intensityOni = 0.0f;
 float intensityThree = 0.0f;
 
+float colorLight1 = 0;
+float colorLight2 = 0;
+float colorLight3 = 0;
 
+float Light1posx, Light1posz = 0;
+float Light2posx, Light2posz = 0;
+float Light3posx, Light3posz = 0;
+
+float Light1angx, Light1angz = 0;
+float Light2angx, Light2angz = 0;
+float Light3angx, Light3angz = 0;
+
+float colorang, lightangpos = 0;
 
 ///////Variables evento 2///////////////
 
@@ -114,8 +137,25 @@ glm::mat4 model(1.0);
 glm::mat4 modelaux(1.0);
 glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
+/////////Variables evento 4/////////////
 
-//Luces
+glm::vec3 posVodoo = glm::vec3(22.996f, 2.3037f, 25.164f);
+float scaleVodoo = 1.0f;
+
+glm::vec3 posDoor1 = glm::vec3(27.498f, 2.4226f, 24.381f);
+glm::vec3 posDoor2 = glm::vec3(27.498f, 2.4226f, 25.973f);
+
+float angTape = 0;
+
+glm::vec3 posGhost = glm::vec3(32.834f, 1.3739f, 25.145f);
+float angGhost = 0;
+float scaleGhost = 0.0f;
+
+float tempo4 = 0;
+
+float LightIntensity_E4 = 0.2f;
+float DemonLightIntensity_E4 = 0.0f;
+
 
 
 // Vertex Shader
@@ -206,13 +246,27 @@ void CreateObjects()
 		0.0f, 0.5f, -0.25f,		0.233f, 1.0f,		0.0f, 0.0f, 0.0f,
 	};
 
+	//En create objects: 
+	unsigned int kanjiIndices[] = {
+			0, 1, 2,
+			0, 2, 3,
+	};
+
+	GLfloat KanjiVertices[] = {
+		-0.5f, -0.5f, 0.0f,   	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+
+	};
+
 	Mesh* obj1 = new Mesh();
 	obj1->CreateMesh(vegetacionVertices, vegetacionIndices, 64, 12);
 	meshList.push_back(obj1);
 
 
 	Mesh* obj2 = new Mesh();
-	obj2->CreateMesh(vegetacionVertices, vegetacionIndices, 64, 12);
+	obj2->CreateMesh(KanjiVertices, kanjiIndices, 32, 6);
 	meshList.push_back(obj2);
 	// fin create objects
 
@@ -453,6 +507,32 @@ std::vector<float> coefzSn = { -4.7800148e-14f,
 
 int evento1(int seq) {
 
+	colorLight1 = sin(colorang);
+	colorLight2 = cos(colorang);
+	colorLight3 = cos(colorang);
+
+	Light1posx = 4.0f * cos(lightangpos);
+	Light1posz = 4.0f * sin(lightangpos) + 109.0f;
+
+	Light2posx = 4.0f * cos(lightangpos + 90* toRadians);
+	Light2posz = 4.0f * sin(lightangpos + 90 * toRadians) + 109.0f;
+
+	Light3posx = 4.0f * cos(lightangpos + 180 * toRadians);;
+	Light3posz = 4.0f * sin(lightangpos + 180 * toRadians) + 109.0f;
+
+	Light1angx = -0.5 * cos(lightangpos);
+	Light1angz = -0.5 * sin(lightangpos);
+
+	Light2angx = 0.5 * sin(lightangpos);
+	Light2angz = -0.5 * cos(lightangpos);
+
+	Light3angx = 0.5 * cos(lightangpos);
+	Light3angz = 0.5 * sin(lightangpos);
+
+
+	colorang += 0.05f * deltaTime;
+	lightangpos += 0.05f * deltaTime;
+
 	switch (seq) {
 		case 0:
 			intensityFloor = 0.0f;
@@ -462,6 +542,9 @@ int evento1(int seq) {
 			posz = 109.15f;
 			posy = -1.3f;
 			vel = 20.0f;
+
+			colorang = 0.0f;
+			lightangpos = 0.0f;
 			
 			return 1;
 		case 1:
@@ -524,8 +607,6 @@ int evento1(int seq) {
 
 			posxA = posx;
 			poszA = posz;
-
-
 
 			if (timeAC > coefzCn.size()*2*vel) {
 				posx = 0;
@@ -597,9 +678,165 @@ int evento2(int seq) {
 	}
 }
 
+int evento3(int seq) {
+	switch (seq)
+	{
+		case 0:
+
+			for (ObjetosFlotantes& f : flotantes) {
+				f.GoTofloor(deltaTime);
+			}
+
+
+			break;
+
+		case 1:
+
+			for (ObjetosFlotantes& f : flotantes) {
+				f.Move(deltaTime);
+			}
+			break;
+	}
+
+	return seq;
+}
+
+int evento4(int seq) {
+
+	//angY += deltaTime;
+	//posGhost.y = 0.005f * sin(angY*toRadians);
+
+	switch (seq)
+	{
+
+	case 0:
+
+		posVodoo = glm::vec3(22.996f, 2.3037f, 25.164f);
+		scaleVodoo = 0.0f;
+
+		posDoor1 = glm::vec3(27.498f, 2.4226f, 24.381f);
+		posDoor2 = glm::vec3(27.498f, 2.4226f, 25.973f);
+
+		angTape = 0;
+		angGhost = 0;
+
+		posGhost = glm::vec3(32.834f, 1.3739f, 25.145f);
+		scaleGhost = 0.0f;
+
+		tempo4 = 0;
+
+		LightIntensity_E4 = 0;
+
+		//angY = 0;
+
+		return 1;
+
+		break;
+
+	case 1:
+
+		posDoor1.z -= 0.25f * deltaTime;
+		posDoor2.z += 0.25f * deltaTime;
+
+		if (posDoor1.z < 23.0f) {
+			posDoor1.z = 23.0f;
+			posDoor2.z = 27.5f;
+			return 2;
+		}
+
+		return 1;
+
+	case 2:
+
+		angTape += 0.2f * deltaTime;
+
+		if (angTape > 100.0f) {
+			angTape = 100.0f;
+			return 3;
+		}
+
+		return 2;
+
+	case 3:
+
+		scaleGhost += 0.05f * deltaTime;
+
+		posGhost.x -= 0.06f * deltaTime;
+		posGhost.y += 0.02f * deltaTime;
+
+		if (scaleGhost > 1.0f) {
+			scaleGhost = 1.0f;
+			DemonLightIntensity_E4 = 2.0f;
+			return 4;
+		}
+
+		return 3;
+
+	case 4:
+
+		tempo4 += deltaTime;
+
+		if (tempo4 > 100.0f) {
+			return 5;
+		}
+
+		return 4;
+
+	case 5:
+
+		angGhost += 0.6f * deltaTime;
+
+		if (angGhost > 90.0f) {
+			return 6;
+		}
+
+		return 5;
+		
+	case 6:
+
+		posGhost.z += 0.08f * deltaTime;
+
+		if (posGhost.z > 32.0f) {
+			return 7;
+		}
+
+		return 6;
+
+	case 7:
+
+		posDoor1.z += 0.06f * deltaTime;
+		posDoor2.z -= 0.06f * deltaTime;
+
+		if (posDoor1.z > 24.381f) {
+			posDoor1.z = 24.381f;
+			posDoor2.z = 25.973f;
+		}
+
+		angTape -= 2.0f * deltaTime;
+
+		if (ang < 0) {
+			angTape = 0;
+		}
+
+		scaleVodoo += 0.02*deltaTime;
+
+		if (scaleVodoo > 1.0f)
+		{
+			scaleVodoo = 1.0f;
+			DemonLightIntensity_E4 = 0.0f;
+			LightIntensity_E4 = 0.2f;
+			return -1;
+		}
+
+		return 7;
+
+	}
+
+}
 
 int main()
 {
+
 	srand(time(0));
 
 	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
@@ -609,6 +846,8 @@ int main()
 
 	eventManager.AddEvent(0, 110, &evento1);
 	eventManager.AddEvent(-14, 68, &evento2);
+	eventManager.AddAction(15, 66, 2, &evento3);
+	eventManager.AddEvent(22, 24, &evento4);
 
 	CreateObjects();
 	CreateShaders();
@@ -635,6 +874,10 @@ int main()
 	Tumba = Model();
 	Tumba.LoadModel("Models/Grave.obj");
 
+	Mausoleo = Model();
+	Mausoleo.LoadModel("Models/Mausoleo.obj");
+
+
 	Doll = Model();
 	Doll.LoadModel("Models/Doll.obj");
 
@@ -657,6 +900,35 @@ int main()
 	LamparaTori = Model();
 	LamparaTori.LoadModel("Models/LampRojo.obj");
 
+	Desktop = Model();
+	Desktop.LoadModel("Models/Desktop.obj");
+
+	Vodoo = Model();
+	Vodoo.LoadModel("Models/Vodoo.obj");
+
+	Walls = Model();
+	Walls.LoadModel("Models/Walls.obj");
+
+	Door = Model();
+	Door.LoadModel("Models/Door.obj");
+
+	Ghost = Model();
+	Ghost.LoadModel("Models/Ghost.obj");
+
+	Chest = Model();
+	Chest.LoadModel("Models/Chest.obj");
+
+	ChestTape = Model();
+	ChestTape.LoadModel("Models/ChestTape.obj");
+
+
+
+
+
+	for (int i = 0; i < 50; i++) {
+		flotantes.push_back(ObjetosFlotantes(&Doll));
+	}
+
 
 	ArbolTexture[0] = Texture("Textures/ArbolTexture.png");
 	ArbolTexture[0].LoadTextureA();
@@ -666,6 +938,9 @@ int main()
 
 	ArbolTexture[2] = Texture("Textures/ArbolTexture2.png");
 	ArbolTexture[2].LoadTextureA();
+
+	KanjiTexture = Texture("Textures/OniKanjiTexture.png");
+	KanjiTexture.LoadTextureA();
 
 
 	std::vector<std::string> skyboxFaces;
@@ -759,6 +1034,13 @@ int main()
 		0.1f, 0.2f, 0.1f);
 	pointLightCount++;
 
+	/////Casa de cofre
+	pointLights[11] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
 
 	unsigned int spotLightCount = 0;
 
@@ -847,6 +1129,22 @@ int main()
 		70.0f);
 	spotLightCount++;
 
+	spotLights[10] = SpotLight(1.0f, 0.0f, 1.0f,
+		3.0f, 3.0f,
+		28.082f, 3.6624f, 23.996f,
+		0.5f, -0.5f, 0.3f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[11] = SpotLight(1.0f, 0.0f, 1.0f,
+		3.0f, 3.0f,
+		28.082f, 3.6624f, 26.251f,
+		0.5f, -0.5f, -0.3f,
+		0.1f, 0.2f, 0.1f,
+		70.0f);
+	spotLightCount++;
+
 	//Luz de totem
 	std::vector<glm::vec3> posicionArboles;
 	std::vector<int> tipoArboles;
@@ -877,6 +1175,8 @@ int main()
 
 
 	bool anterior = true;
+
+	ObjetosFlotantes meh = ObjetosFlotantes(&Tumba);
 
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
@@ -947,6 +1247,106 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Casa.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(23.226f, 0.9742f, 25.115f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Desktop.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, posVodoo);
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(scaleVodoo, scaleVodoo, scaleVodoo));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Vodoo.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(27.758f, 2.2576f, 30.313f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Walls.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model,posDoor1);
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Door.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, posDoor2);
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Door.RenderModel();
+
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(32.903f, 0.9577f, 25.115f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Chest.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(33.661f, 2.1387f, 25.115f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, angTape * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		ChestTape.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model,posGhost);
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, angGhost * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(scaleGhost, scaleGhost, scaleGhost));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Ghost.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(21.274f, 1.0f, 26.37f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[11].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[11].SetIntensity(LightIntensity_E4);
+
+		spotLights[10].SetIntensity(DemonLightIntensity_E4, DemonLightIntensity_E4);
+
+		spotLights[11].SetIntensity(DemonLightIntensity_E4, DemonLightIntensity_E4);
+
 		//////////////Casa se pasillo////////////////
 
 		model = glm::mat4(1.0);
@@ -969,6 +1369,10 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Casa.RenderModel();
+
+		for (ObjetosFlotantes &f : flotantes) {
+			f.Render(uniformModel, uniformColor);
+		}
 
 
 		//////////////Casa invocacion///////////////////
@@ -1025,8 +1429,31 @@ int main()
 		pointLights[10].SetIntensity(intensityOni);
 
 		spotLights[7].SetIntensity(intensityThree, intensityThree);
+		spotLights[7].SetFlash(glm::vec3(Light1posx, 4.0f, Light1posz), glm::vec3(Light1angx, -0.5f, Light1angz));
+		spotLights[7].SetColor(glm::vec3(1.0,1.0,colorLight1));
+
 		spotLights[8].SetIntensity(intensityThree, intensityThree);
+		spotLights[8].SetFlash(glm::vec3(Light2posx, 4.0f, Light2posz), glm::vec3(Light2angx, -0.5f, Light2angz));
+		spotLights[8].SetColor(glm::vec3(1.0, colorLight2, 1.0));
+
 		spotLights[9].SetIntensity(intensityThree, intensityThree);
+		spotLights[9].SetFlash(glm::vec3(Light3posx, 4.0f, Light3posz), glm::vec3(Light3angx, -0.5f, Light3angz));
+		spotLights[9].SetColor(glm::vec3(colorLight3, 1.0, 1.0));
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0,1.4f,110.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		//blending: transparencia o traslucidez
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		KanjiTexture.UseTexture();
+		//Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[1]->RenderMesh();
+		glDisable(GL_BLEND);
 
 
 		//////////////Lamparas///////////////////
@@ -1372,6 +1799,15 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Tumba.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(30.0f, 0.71988f, 46.941f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Mausoleo.RenderModel();
+
 		/////////Arboles/////////
 
 		glEnable(GL_BLEND);
@@ -1474,7 +1910,6 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Zombie.RenderModel();
-
 		
 
 

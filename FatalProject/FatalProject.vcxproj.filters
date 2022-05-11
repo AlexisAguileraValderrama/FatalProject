@@ -60,6 +60,9 @@
     <ClCompile Include="FatalProjectMain.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="ObjetosFlotantes.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjetosFlotantes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
