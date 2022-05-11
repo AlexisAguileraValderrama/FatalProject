@@ -1,19 +1,4 @@
-﻿  FatalProjectMain.cpp
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(523,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(524,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(526,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(527,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(529,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(530,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(821,31): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(840,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1187,15): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1189,43): warning C4244: '+=': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1815,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(299): warning C4172: returning address of local variable or temporary: pos
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(679): warning C4715: 'evento2': not all control paths return a value
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(835): warning C4715: 'evento4': not all control paths return a value
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(647): warning C4715: 'evento1': not all control paths return a value
+﻿  Camera.cpp
+  Player.cpp
+  Generating Code...
   FatalProject.vcxproj -> C:\Users\sonic\Desktop\ProjectFatal\FatalProject\Debug\FatalProject.exe

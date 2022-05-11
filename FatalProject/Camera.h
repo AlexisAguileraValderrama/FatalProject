@@ -7,13 +7,14 @@
 
 #include <glfw3.h>
 
+#include "Player.h"
+
 class Camera
 {
 public:
 	Camera();
-	Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed);
+	Camera(Player *player, glm::vec3 startUp, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed);
 
-	void keyControl(bool* keys, GLfloat deltaTime);
 	void mouseControl(GLfloat xChange, GLfloat yChange);
 
 	glm::vec3 getCameraPosition();
@@ -21,6 +22,10 @@ public:
 	glm::mat4 calculateViewMatrix();
 
 	~Camera();
+
+	Player *player;
+
+	void update();
 
 private:
 	glm::vec3 position;
@@ -34,7 +39,5 @@ private:
 
 	GLfloat moveSpeed;
 	GLfloat turnSpeed;
-
-	void update();
 };
 

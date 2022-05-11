@@ -10,7 +10,7 @@ Event::Event(int x, int z, int (*evento)(int))
 
 Event::Event(int x, int z, int numActions, int (*evento)(int))
 {
-	pos = glm::vec3(x, 0, z);
+	pos = glm::vec3(x, 2.0f, z);
 	this->evento = evento;
 	this->numActions = numActions;
 	isRunning = false;

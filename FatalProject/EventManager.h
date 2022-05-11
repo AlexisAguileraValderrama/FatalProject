@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Event.h"
-#include "Window.h"
-#include "Camera.h"
 
 #include <vector>
 

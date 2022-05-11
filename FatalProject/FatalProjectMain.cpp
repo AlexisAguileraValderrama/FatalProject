@@ -31,6 +31,7 @@ Práctica 5: Carga de Modelos
 
 #include "EventManager.h"
 #include "ObjetosFlotantes.h"
+#include "Player.h"
 
 //para iluminación
 #include "CommonValues.h"
@@ -49,6 +50,8 @@ std::vector<Shader> shaderList;
 Camera camera;
 
 EventManager eventManager;
+
+Model Kaishi;
 
 Model Terreno;
 Model Casa;
@@ -100,6 +103,12 @@ DirectionalLight mainLight;
 //para declarar varias luces de tipo pointlight
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
+
+//Variables de avatar
+
+
+
+glm::vec3 PlayerPos = glm::vec3(0.0f, 2.836f, 0.0);
 
 ////////Evento 1/////////////
 
@@ -852,8 +861,11 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
+	Player player = Player(PlayerPos, 0,0.2f,0.5f);
+	camera = Camera(&player, glm::vec3(0.0f, 0.5f, 0.0f), 0.0f, 0.2f, 0.5f);
 
+	Kaishi = Model();
+	Kaishi.LoadModel("Models/Kaishi.obj");
 
 	Terreno = Model();
 	Terreno.LoadModel("Models/Terreno.obj");
@@ -960,7 +972,7 @@ int main()
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.2f, 0.2f,
+		0.6f, 0.6f,
 		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
@@ -1176,8 +1188,6 @@ int main()
 
 	bool anterior = true;
 
-	ObjetosFlotantes meh = ObjetosFlotantes(&Tumba);
-
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 	////Loop mientras no se cierra la ventana
@@ -1191,7 +1201,10 @@ int main()
 
 		//Recibir eventos del usuario
 		glfwPollEvents();
-		camera.keyControl(mainWindow.getsKeys(), deltaTime);
+		//camera.keyControl(mainWindow.getsKeys(), deltaTime);
+		player.mouseControl(mainWindow.getXChange());
+		player.keyControl(mainWindow.getsKeys(), deltaTime);
+		printf("  %.2f       %.2f       %.2f     \n", player.pos.x, player.pos.y, player.pos.z);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		// Clear the window
@@ -1212,7 +1225,7 @@ int main()
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		eventManager.Update(mainWindow.getAction(), camera.getCameraPosition());
+		eventManager.Update(mainWindow.getAction(), player.pos);
 
 		// luz ligada a la cámara de tipo flash
 		glm::vec3 lowerLight = camera.getCameraPosition();
@@ -1224,6 +1237,23 @@ int main()
 		shaderList[0].SetDirectionalLight(&mainLight);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
+
+		//Definicion de avatar
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, player.pos);
+		model = model = glm::rotate(model, player.yaw * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = model;
+
+		model = modelaux;
+
+		model = glm::translate(model, glm::vec3(0.0f, -1.836f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Kaishi.RenderModel();
+
 
 		////////////Terreno///////
 
