@@ -107,15 +107,14 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
-	if (key == GLFW_KEY_Y)
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
 	{
-		theWindow-> muevex += 1.0;
+		theWindow->isIsometric = !(theWindow->isIsometric);
 	}
 	
 	if (key == GLFW_KEY_B && action == GLFW_PRESS)
 	{
 		theWindow->actionState = !(theWindow ->actionState);
-		printf(" %d'\n", theWindow->actionState);
 	}
 
 

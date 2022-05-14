@@ -13,9 +13,7 @@ class Camera
 {
 public:
 	Camera();
-	Camera(Player *player, glm::vec3 startUp, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed);
-
-	void mouseControl(GLfloat xChange, GLfloat yChange);
+	Camera(Player *player, glm::vec3 startUp, GLfloat startPitch);
 
 	glm::vec3 getCameraPosition();
 	glm::vec3 getCameraDirection();
@@ -25,7 +23,7 @@ public:
 
 	Player *player;
 
-	void update();
+	void update(bool isometric);
 
 private:
 	glm::vec3 position;
@@ -39,5 +37,7 @@ private:
 
 	GLfloat moveSpeed;
 	GLfloat turnSpeed;
+
+	bool isIsometric = false;
 };
 

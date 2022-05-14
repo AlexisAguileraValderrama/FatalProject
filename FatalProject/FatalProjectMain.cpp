@@ -80,6 +80,12 @@ Model Chest;
 Model ChestTape;
 
 Model objetos[5];
+
+Model KaishiParts[5];
+
+Model Chaser;
+Model WallsPasillo;
+
 std::vector<ObjetosFlotantes> flotantes;
 
 
@@ -87,6 +93,7 @@ Texture ArbolTexture[3];
 Texture KanjiTexture;
 
 Skybox skybox;
+Skybox skybox2;
 
 //materiales
 Material Material_brillante;
@@ -104,11 +111,21 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
+//Daytime
+
+float daytime = 0;
+float daytimevel = 0.05f;
+
+float daytimeLightpointLights = 0.2f;
+float daytimeLightspointLights = 10.0f;
+
+bool day = false;
+
 //Variables de avatar
 
-
-
 glm::vec3 PlayerPos = glm::vec3(0.0f, 2.836f, 0.0);
+
+Player player = Player(PlayerPos, 0, 0.2f, 1.0f, KaishiParts);
 
 ////////Evento 1/////////////
 
@@ -138,13 +155,19 @@ float angCuerdas = 0;
 glm::vec3 posZombie = glm::vec3(-20.604f, 5.3777f, 77.374f);
 float angZombie = 0;
 
+float LightIntensity_E2 = 0.2f;
+
+float angTamboleoCuerdas = 0.0f;
+float timeTamboleo = 0.0f;
+
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0;
 GLuint uniformColor = 0;
 
-glm::mat4 model(1.0);
-glm::mat4 modelaux(1.0);
-glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+/////////Variables 3////////////////
+
+float LightIntensity_E3 = 0.2f;
+float LightIntensitySpotLight_E3 = 0.0f;
 
 /////////Variables evento 4/////////////
 
@@ -165,7 +188,22 @@ float tempo4 = 0;
 float LightIntensity_E4 = 0.2f;
 float DemonLightIntensity_E4 = 0.0f;
 
+////////Variables para evento 5/////
 
+
+float chaseTimer = 0;
+float desplazamientoChaser = 0;
+glm::vec3 posChaser = glm::vec3(-35.003,0.7011f,46.613f);
+float angChaser = 0;
+
+float LightIntensity_E5 = 0.2f;
+float chaserScale = 0.0f;
+
+////////////////
+
+glm::mat4 model(1.0);
+glm::mat4 modelaux(1.0);
+glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -664,6 +702,8 @@ int evento2(int seq) {
 		angCuerdas = 0;
 		angZombie = 0;
 		posZombie = glm::vec3(-20.604f, 5.3777f, 77.374f);
+		LightIntensity_E2 = 0.0f;
+		timeTamboleo = 0;
 
 		return 1;
 
@@ -673,16 +713,22 @@ int evento2(int seq) {
 			angCuerdas -= 1.5f * deltaTime;
 		}
 
-		posZombie -= glm::vec3(0.0,0.3*deltaTime,0.0f);
+		timeTamboleo += 1.3f * deltaTime;
 
-		angZombie += 1.7f * deltaTime;
+		if (timeTamboleo > 360) {
+			timeTamboleo = 0;
+		}
+
+		angTamboleoCuerdas = 7.0f * cos(timeTamboleo * toRadians);
+
 
 		if (posZombie.y > -40.0f) {
-			return 1;
+			posZombie -= glm::vec3(0.0, 0.3 * deltaTime, 0.0f);
+
+			angZombie += 1.7f * deltaTime;
 		}
-		else {
-			return -1;
-		}
+
+		return 1;
 
 	}
 }
@@ -692,6 +738,9 @@ int evento3(int seq) {
 	{
 		case 0:
 
+			LightIntensity_E3 = 0.2f;
+			LightIntensitySpotLight_E3 = 0.0f;
+
 			for (ObjetosFlotantes& f : flotantes) {
 				f.GoTofloor(deltaTime);
 			}
@@ -700,6 +749,9 @@ int evento3(int seq) {
 			break;
 
 		case 1:
+
+			LightIntensity_E3 = 0.0f;
+			LightIntensitySpotLight_E3 = 3.0f;
 
 			for (ObjetosFlotantes& f : flotantes) {
 				f.Move(deltaTime);
@@ -843,6 +895,63 @@ int evento4(int seq) {
 
 }
 
+int evento5(int seq) {
+
+	switch (seq)
+	{
+
+	case 0:
+
+		posChaser = glm::vec3(-35.003, 2.162f, 46.548f);
+		chaseTimer = 0.0f;
+		LightIntensity_E5 = 0.0f;
+		chaserScale = 1.0f;
+
+		return 1;
+
+
+	case 1:
+		chaseTimer += 0.1 * deltaTime;
+
+		desplazamientoChaser = 0;
+		angChaser = AngleOf2(glm::vec2(posChaser.x, posChaser.z), glm::vec2(player.pos.x, player.pos.z));
+
+
+		if (glm::distance(posChaser, player.pos) > 2.0f) {
+			desplazamientoChaser += 0.05 * deltaTime;
+		}
+
+		if (chaseTimer > 100) {
+			return 2;
+		}
+
+		return 1;
+
+	case 2:
+		chaseTimer += 0.5 * deltaTime;
+
+		desplazamientoChaser = 0;
+		angChaser = AngleOf2(glm::vec2(posChaser.x, posChaser.z), glm::vec2(-35.003, 46.548f));
+
+
+		if (glm::distance(posChaser, glm::vec3(-35.003, 2.162f, 46.548f)) > 0.2f) {
+			desplazamientoChaser += 0.05 * deltaTime;
+		}
+		else {
+			LightIntensity_E5 = 0.2f;
+			chaserScale = 0.0f;
+			return -1;
+		}
+
+		return 2;
+	
+
+	default:
+		break;
+	}
+
+}
+
 int main()
 {
 
@@ -857,12 +966,10 @@ int main()
 	eventManager.AddEvent(-14, 68, &evento2);
 	eventManager.AddAction(15, 66, 2, &evento3);
 	eventManager.AddEvent(22, 24, &evento4);
+	eventManager.AddEvent(-29, 46, &evento5);
 
 	CreateObjects();
 	CreateShaders();
-
-	Player player = Player(PlayerPos, 0,0.2f,0.5f);
-	camera = Camera(&player, glm::vec3(0.0f, 0.5f, 0.0f), 0.0f, 0.2f, 0.5f);
 
 	Kaishi = Model();
 	Kaishi.LoadModel("Models/Kaishi.obj");
@@ -933,9 +1040,30 @@ int main()
 	ChestTape = Model();
 	ChestTape.LoadModel("Models/ChestTape.obj");
 
+	KaishiParts[0] = Model();
+	KaishiParts[0].LoadModel("Models/KaishiTorso.obj");
+
+	KaishiParts[1] = Model();
+	KaishiParts[1].LoadModel("Models/KaishiBrazo.obj");
+
+	KaishiParts[2] = Model();
+	KaishiParts[2].LoadModel("Models/KaishiAntebrazo.obj");
+
+	KaishiParts[3] = Model();
+	KaishiParts[3].LoadModel("Models/KaishiPierna.obj");
+
+	KaishiParts[4] = Model();
+	KaishiParts[4].LoadModel("Models/KaishiEspinilla.obj");
 
 
+	Chaser = Model();
+	Chaser.LoadModel("Models/Chaser.obj");
 
+	WallsPasillo = Model();
+	WallsPasillo.LoadModel("Models/WallsPasillo.obj");
+
+
+	camera = Camera(&player, glm::vec3(0.0f, 0.5f, 0.0f), 0.5f);
 
 	for (int i = 0; i < 50; i++) {
 		flotantes.push_back(ObjetosFlotantes(&Doll));
@@ -965,6 +1093,16 @@ int main()
 
 	skybox = Skybox(skyboxFaces);
 
+	std::vector<std::string> skyboxFaces2;
+	skyboxFaces2.push_back("Textures/Skybox/left_n.jpg");
+	skyboxFaces2.push_back("Textures/Skybox/right_n.jpg");
+	skyboxFaces2.push_back("Textures/Skybox/bottom_n.jpg");
+	skyboxFaces2.push_back("Textures/Skybox/top_n.jpg");
+	skyboxFaces2.push_back("Textures/Skybox/back_n.jpg");
+	skyboxFaces2.push_back("Textures/Skybox/front_n.jpg");
+
+	skybox2 = Skybox(skyboxFaces2);
+
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
@@ -972,7 +1110,7 @@ int main()
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.6f, 0.6f,
+		0.6, 0.6f,
 		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
@@ -1048,6 +1186,27 @@ int main()
 
 	/////Casa de cofre
 	pointLights[11] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	/////Casa de objetos flotantes
+	pointLights[12] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	/////Sacrificios
+	pointLights[13] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	/////Pasillo
+	pointLights[14] = PointLight(0.7f, 0.7f, 0.0f,
 		0.2f, 0.2f,
 		2.0f, 1.5f, 1.5f,
 		0.1f, 0.2f, 0.1f);
@@ -1157,6 +1316,24 @@ int main()
 		70.0f);
 	spotLightCount++;
 
+	///Casa de cosas flotantes
+
+	spotLights[12] = SpotLight(0.6f, 0.5f, 1.0f,
+		3.0f, 3.0f,
+		17.584f, 3.8812f, 73.47f,
+		0.5f, -0.5f, -0.3f,
+		0.04f, 0.08f, 0.04f,
+		70.0f);
+	spotLightCount++;
+
+	spotLights[13] = SpotLight(0.6f, 0.5f, 1.0f,
+		3.0f, 3.0f,
+		17.584f, 3.8812f, 60.517f,
+		0.5f, -0.5f, 0.3f,
+		0.04f, 0.08f, 0.04f,
+		70.0f);
+	spotLightCount++;
+
 	//Luz de totem
 	std::vector<glm::vec3> posicionArboles;
 	std::vector<int> tipoArboles;
@@ -1204,13 +1381,18 @@ int main()
 		//camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		player.mouseControl(mainWindow.getXChange());
 		player.keyControl(mainWindow.getsKeys(), deltaTime);
-		printf("  %.2f       %.2f       %.2f     \n", player.pos.x, player.pos.y, player.pos.z);
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+		camera.update(mainWindow.getIsometric());
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		if (day) {
+			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
+		else {
+			skybox2.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
+
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -1231,6 +1413,28 @@ int main()
 		glm::vec3 lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
 		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+
+		daytime += deltaTime * 0.1f;
+
+		if (daytime > 360) {
+			daytime = 0;
+		}
+
+		if (daytime > 10 && daytime < 210) {
+			daytimeLightpointLights = 0.0f;
+			daytimeLightspointLights = 0.0f;
+			day = true;
+		}
+		else {
+			daytimeLightpointLights = 0.2f;
+			daytimeLightspointLights = 10.0f;
+			day = false;
+		}
+
+		//Main Light
+		mainLight.Use(1.0f, 0.1f*sin(daytime*toRadians) + 0.8f, 0.3*sin(daytime*toRadians) + 0.5f,
+			0.25 * sin(daytime*toRadians) + 0.5, 0.25 * sin(daytime*toRadians) + 0.5,
+			0.5*cos(daytime*toRadians), -abs(0.5*sin(daytime*toRadians)), 0);
 		
 
 		//información al shader de fuentes de iluminación
@@ -1240,20 +1444,9 @@ int main()
 
 		//Definicion de avatar
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, player.pos);
-		model = model = glm::rotate(model, player.yaw * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		modelaux = model;
-
-		model = modelaux;
-
-		model = glm::translate(model, glm::vec3(0.0f, -1.836f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		Kaishi.RenderModel();
-
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		player.RenderKaishi(uniformColor,uniformModel);
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 
 		////////////Terreno///////
 
@@ -1362,7 +1555,7 @@ int main()
 
 		model = glm::mat4(1.0);
 
-		model = glm::translate(model, glm::vec3(21.274f, 1.0f, 26.37f));
+		model = glm::translate(model, glm::vec3(22.0f, 1.0f, 24.0f));
 		modelaux = model;
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -1389,6 +1582,46 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Casa.RenderModel();
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-23.122f, 2.31f, 46.838f));
+		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		WallsPasillo.RenderModel();
+
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model,posChaser);
+		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, angChaser - (90*toRadians) , glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(-desplazamientoChaser, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(chaserScale, chaserScale, chaserScale));
+
+		posChaser.x = model[3][0];
+		posChaser.y = model[3][1];
+		posChaser.z = model[3][2];
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Chaser.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-29.234f, 1.0f, 46.613f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[14].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[14].SetIntensity(LightIntensity_E5);
+
 		///////////////Casa de cosas flotantes///////////////
 
 		model = glm::mat4(1.0);
@@ -1403,6 +1636,22 @@ int main()
 		for (ObjetosFlotantes &f : flotantes) {
 			f.Render(uniformModel, uniformColor);
 		}
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(15.0f, 1.0f, 68.0f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[12].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[12].SetIntensity(LightIntensity_E3);
+
+		spotLights[12].SetIntensity(LightIntensitySpotLight_E3, LightIntensitySpotLight_E3);
+		spotLights[13].SetIntensity(LightIntensitySpotLight_E3, LightIntensitySpotLight_E3);
 
 
 		//////////////Casa invocacion///////////////////
@@ -1501,6 +1750,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[0].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[0].SetIntensity(daytimeLightpointLights);
 
 		/////1
 
@@ -1516,6 +1766,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[1].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[1].SetIntensity(daytimeLightpointLights);
 		
 		/////2
 
@@ -1530,6 +1781,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[2].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[2].SetIntensity(daytimeLightpointLights);
 
 		/////3
 
@@ -1544,6 +1796,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[3].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[3].SetIntensity(daytimeLightpointLights);
 
 
 		/////4
@@ -1559,6 +1812,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[4].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[4].SetIntensity(daytimeLightpointLights);
 
 		/////5
 
@@ -1573,6 +1827,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[5].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[5].SetIntensity(daytimeLightpointLights);
 
 		/////6
 
@@ -1587,6 +1842,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[6].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[6].SetIntensity(daytimeLightpointLights);
 
 		/////7
 
@@ -1601,6 +1857,7 @@ int main()
 		Lampara.RenderModel();
 
 		pointLights[7].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 2.3f, modelaux[3][2]));
+		pointLights[7].SetIntensity(daytimeLightpointLights);
 
 		////////////////////Tori////////////////
 
@@ -1626,6 +1883,7 @@ int main()
 
 		spotLights[1].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 								glm::vec3(0.0, -1.0f, 0.0f));
+		spotLights[1].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 		model = glm::mat4(1.0);
 
@@ -1639,6 +1897,7 @@ int main()
 
 		spotLights[2].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 			glm::vec3(0.0, -1.0f, 0.0f));
+		spotLights[2].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 
 
@@ -1664,6 +1923,7 @@ int main()
 
 		spotLights[3].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 			glm::vec3(0.0, -1.0f, 0.0f));
+		spotLights[3].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 		model = glm::mat4(1.0);
 
@@ -1677,6 +1937,8 @@ int main()
 
 		spotLights[4].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 			glm::vec3(0.0, -1.0f, 0.0f));
+
+		spotLights[4].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 
 
@@ -1702,6 +1964,7 @@ int main()
 
 		spotLights[5].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 			glm::vec3(0.0, -1.0f, 0.0f));
+		spotLights[5].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 		model = glm::mat4(1.0);
 
@@ -1715,6 +1978,8 @@ int main()
 
 		spotLights[6].SetFlash(glm::vec3(modelaux[3][0], modelaux[3][1] + 1.5, modelaux[3][2]),
 			glm::vec3(0.0, -1.0f, 0.0f));
+
+		spotLights[6].SetIntensity(daytimeLightspointLights, daytimeLightspointLights);
 
 		////////////////////Valla////////////////
 
@@ -1898,6 +2163,7 @@ int main()
 		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, angTamboleoCuerdas * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
@@ -1910,6 +2176,7 @@ int main()
 		model = glm::rotate(model, 50 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, angTamboleoCuerdas * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -1923,6 +2190,7 @@ int main()
 		model = glm::rotate(model, -52 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		model = glm::rotate(model, angCuerdas * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, angTamboleoCuerdas * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
@@ -1941,6 +2209,19 @@ int main()
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		Zombie.RenderModel();
 		
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-14.0f, 1.0f, 68.0f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[13].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[13].SetIntensity(LightIntensity_E2);
+
 
 
 		glUseProgram(0);
