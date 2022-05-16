@@ -32,11 +32,7 @@ private:
 	glm::vec3 right;
 	glm::vec3 worldUp;
 
-	GLfloat yaw;
 	GLfloat pitch;
-
-	GLfloat moveSpeed;
-	GLfloat turnSpeed;
 
 	bool isIsometric = false;
 };

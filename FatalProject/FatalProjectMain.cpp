@@ -51,8 +51,6 @@ Camera camera;
 
 EventManager eventManager;
 
-Model Kaishi;
-
 Model Terreno;
 Model Casa;
 Model Lampara;
@@ -79,12 +77,13 @@ Model Ghost;
 Model Chest;
 Model ChestTape;
 
-Model objetos[5];
+Model objetos[6];
 
 Model KaishiParts[5];
 
 Model Chaser;
 Model WallsPasillo;
+
 
 std::vector<ObjetosFlotantes> flotantes;
 
@@ -211,35 +210,6 @@ static const char* vShader = "shaders/shader_light.vert";
 // Fragment Shader
 static const char* fShader = "shaders/shader_light.frag";
 
-
-//cálculo del promedio de las normales para sombreado de Phong
-void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
-	unsigned int vLength, unsigned int normalOffset)
-{
-	for (size_t i = 0; i < indiceCount; i += 3)
-	{
-		unsigned int in0 = indices[i] * vLength;
-		unsigned int in1 = indices[i + 1] * vLength;
-		unsigned int in2 = indices[i + 2] * vLength;
-		glm::vec3 v1(vertices[in1] - vertices[in0], vertices[in1 + 1] - vertices[in0 + 1], vertices[in1 + 2] - vertices[in0 + 2]);
-		glm::vec3 v2(vertices[in2] - vertices[in0], vertices[in2 + 1] - vertices[in0 + 1], vertices[in2 + 2] - vertices[in0 + 2]);
-		glm::vec3 normal = glm::cross(v1, v2);
-		normal = glm::normalize(normal);
-
-		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
-		vertices[in0] += normal.x; vertices[in0 + 1] += normal.y; vertices[in0 + 2] += normal.z;
-		vertices[in1] += normal.x; vertices[in1 + 1] += normal.y; vertices[in1 + 2] += normal.z;
-		vertices[in2] += normal.x; vertices[in2 + 1] += normal.y; vertices[in2 + 2] += normal.z;
-	}
-
-	for (size_t i = 0; i < verticeCount / vLength; i++)
-	{
-		unsigned int nOffset = i * vLength + normalOffset;
-		glm::vec3 vec(vertices[nOffset], vertices[nOffset + 1], vertices[nOffset + 2]);
-		vec = glm::normalize(vec);
-		vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
-	}
-}
 
 
 //En create objects: 
@@ -764,8 +734,6 @@ int evento3(int seq) {
 
 int evento4(int seq) {
 
-	//angY += deltaTime;
-	//posGhost.y = 0.005f * sin(angY*toRadians);
 
 	switch (seq)
 	{
@@ -788,7 +756,6 @@ int evento4(int seq) {
 
 		LightIntensity_E4 = 0;
 
-		//angY = 0;
 
 		return 1;
 
@@ -952,6 +919,8 @@ int evento5(int seq) {
 
 }
 
+
+
 int main()
 {
 
@@ -962,17 +931,14 @@ int main()
 
 	eventManager = EventManager();
 
-	eventManager.AddEvent(0, 110, &evento1);
-	eventManager.AddEvent(-14, 68, &evento2);
-	eventManager.AddAction(15, 66, 2, &evento3);
-	eventManager.AddEvent(22, 24, &evento4);
-	eventManager.AddEvent(-29, 46, &evento5);
+	eventManager.AddEvent(0, 110, &evento1);     //Animación de invocacion demoniaca
+	eventManager.AddEvent(-14, 68, &evento2);    //Animación de sacrficio semi humano
+	eventManager.AddAction(15, 66, 2, &evento3); //Animación de cosas flotantes
+	eventManager.AddEvent(22, 24, &evento4);     //Animación de cofre demoniaco
+	eventManager.AddEvent(-29, 46, &evento5);    //Animación de 
 
 	CreateObjects();
 	CreateShaders();
-
-	Kaishi = Model();
-	Kaishi.LoadModel("Models/Kaishi.obj");
 
 	Terreno = Model();
 	Terreno.LoadModel("Models/Terreno.obj");
@@ -982,7 +948,6 @@ int main()
 
 	Tori = Model();
 	Tori.LoadModel("Models/Tori.obj");
-
 
 	Lampara = Model();
 	Lampara.LoadModel("Models/Lamp.obj");
@@ -1055,7 +1020,6 @@ int main()
 	KaishiParts[4] = Model();
 	KaishiParts[4].LoadModel("Models/KaishiEspinilla.obj");
 
-
 	Chaser = Model();
 	Chaser.LoadModel("Models/Chaser.obj");
 
@@ -1065,8 +1029,27 @@ int main()
 
 	camera = Camera(&player, glm::vec3(0.0f, 0.5f, 0.0f), 0.5f);
 
-	for (int i = 0; i < 50; i++) {
-		flotantes.push_back(ObjetosFlotantes(&Doll));
+	objetos[0] = Model();
+	objetos[0].LoadModel("Models/Katana.obj");
+
+	objetos[1] = Model();
+	objetos[1].LoadModel("Models/Silla.obj");
+
+	objetos[2] = Model();
+	objetos[2].LoadModel("Models/Teapod.obj");
+
+	objetos[3] = Model();
+	objetos[3].LoadModel("Models/Candle.obj");
+
+	objetos[4] = Model();
+	objetos[4].LoadModel("Models/Estatua.obj");
+
+	objetos[5] = Model();
+	objetos[5].LoadModel("Models/Plateset.obj");
+
+
+	for (int i = 0; i < 60; i++) {
+		flotantes.push_back(ObjetosFlotantes(&objetos[i%6]));
 	}
 
 
@@ -1334,7 +1317,7 @@ int main()
 		70.0f);
 	spotLightCount++;
 
-	//Luz de totem
+	//Arboles
 	std::vector<glm::vec3> posicionArboles;
 	std::vector<int> tipoArboles;
 	std::vector<std::vector<int>> limitesArboles = { { 36,48,13,63 },
@@ -1363,9 +1346,6 @@ int main()
 	}
 
 
-	bool anterior = true;
-
-
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
@@ -1386,6 +1366,8 @@ int main()
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 		if (day) {
 			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
 		}
@@ -1730,7 +1712,6 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		KanjiTexture.UseTexture();
-		//Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[1]->RenderMesh();
 		glDisable(GL_BLEND);
 

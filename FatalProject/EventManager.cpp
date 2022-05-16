@@ -7,9 +7,7 @@
 
 EventManager::EventManager()
 {
-
 	lastActionState = false;
-
 }
 
 EventManager::~EventManager()
@@ -33,8 +31,6 @@ void EventManager::AddAction(int x, int z, int numActions, int (*evento)(int))
 	actions.push_back(*eve);
 
 }
-
-
 
 void  EventManager::Update(bool actionSate, glm::vec3 playerPos) {
 
