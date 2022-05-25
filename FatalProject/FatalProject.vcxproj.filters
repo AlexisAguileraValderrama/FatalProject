@@ -66,6 +66,12 @@
     <ClCompile Include="Player.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="Toroide.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToroideP.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -123,6 +129,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Toroide.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToroideP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

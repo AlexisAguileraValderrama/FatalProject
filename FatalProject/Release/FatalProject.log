@@ -1,13 +1,102 @@
-﻿  FatalProjectMain.cpp
+﻿  Camera.cpp
+  DirectionalLight.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\DirectionalLight.cpp(18,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\DirectionalLight.cpp(19,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\DirectionalLight.cpp(21,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\DirectionalLight.cpp(22,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+  Event.cpp
+  FatalProjectMain.cpp
 C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
 C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(536,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(714,15): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(716,43): warning C4244: '+=': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1052,21): warning C4018: '<': signed/unsigned mismatch
-  Generating code
-  1 of 1220 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    7 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(605,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(606,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(608,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(609,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(611,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(612,19): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(963,31): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1006,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1013,44): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1023,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1030,44): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1118,41): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1242,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1454,20): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1724,15): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1726,43): warning C4244: '+=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1793,32): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1793,7): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1792,71): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1792,34): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1791,86): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(2468,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(2602,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(2640,30): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Light.cpp
+  Material.cpp
+  Mesh_tn.cpp
+  Model.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(16,10): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'const std::string'
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(16,80): warning C4474: 'printf' : too many arguments passed for format string
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(16,80): message : placeholders and their parameters expect 1 variadic arguments, but 2 were provided
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(51,7): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(51,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(138,14): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'std::string'
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Model.cpp(147,14): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'std::string'
+  PointLight.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(28,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(29,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(30,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(32,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(33,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(34,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\PointLight.cpp(35,14): warning C4244: 'argument': conversion from 'GLfloat' to 'GLint', possible loss of data
+  Shader_light.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(207,75): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(207,26): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(206,91): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(206,42): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(220,98): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(220,62): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(220,24): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(219,70): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(219,24): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(218,88): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Shader_light.cpp(218,42): warning C4244: 'argument': conversion from 'GLuint' to 'GLfloat', possible loss of data
+  Skybox.cpp
+  EventManager.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+  ObjetosFlotantes.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(25,18): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(27,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(29,64): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(30,37): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(31,64): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(113,20): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(120,65): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\ObjetosFlotantes.cpp(122,65): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Player.cpp
+  SpotLight.cpp
+  Texture.cpp
+  Toroide.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Toroide.cpp(184,20): warning C4018: '<': signed/unsigned mismatch
+  ToroideP.cpp
+  Window.cpp
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(12,36): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.h(13,37): warning C4244: 'return': conversion from 'GLint' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(143,22): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(144,22): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(148,28): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(149,40): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(151,21): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(152,21): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+  Generating Code...
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\Window.cpp(77): warning C4715: 'Window::Initialise': not all control paths return a value
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1110): warning C4715: 'evento6': not all control paths return a value
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(980): warning C4715: 'evento4': not all control paths return a value
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(797): warning C4715: 'evento2': not all control paths return a value
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(381): warning C4172: returning address of local variable or temporary: pos
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(1048): warning C4715: 'evento5': not all control paths return a value
+C:\Users\sonic\Desktop\ProjectFatal\FatalProject\FatalProject\FatalProjectMain.cpp(751): warning C4715: 'evento1': not all control paths return a value
   FatalProject.vcxproj -> C:\Users\sonic\Desktop\ProjectFatal\FatalProject\Release\FatalProject.exe

@@ -12,6 +12,10 @@ Práctica 5: Carga de Modelos
 #include <math.h>
 #include <random>
 
+#include <irrklang/irrKlang.h>
+
+#pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
+
 #include <glew.h>
 #include <glfw3.h>
 
@@ -39,6 +43,9 @@ Práctica 5: Carga de Modelos
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+
+#include "Toroide.h"
+#include "ToroideP.h"
 
 const float toRadians = 3.14159265f / 180.0f;
 const float PI = 3.14159265f;
@@ -84,12 +91,34 @@ Model KaishiParts[5];
 Model Chaser;
 Model WallsPasillo;
 
+Model Mio;
+Model MioTisa;
+
+Model Rudy;
+Model RudyTisa;
+
+Model CasaR;
+Model CasaTisa;
+
+Model Puerta;
+
+Toroide toro1;
+Toroide toro2;
+Toroide toro3;
+
+ToroideP torop1;
+ToroideP torop2;
+ToroideP torop3;
+
+Model Perro;
 
 std::vector<ObjetosFlotantes> flotantes;
 
 
 Texture ArbolTexture[3];
 Texture KanjiTexture;
+
+Texture KanjisTexture;
 
 Skybox skybox;
 Skybox skybox2;
@@ -98,6 +127,18 @@ Skybox skybox2;
 Material Material_brillante;
 Material Material_opaco;
 
+irrklang::ISoundEngine* engine;
+
+
+
+irrklang::ISound* backgroundMusic;
+
+irrklang::ISound* cofreEventSound;
+irrklang::ISound* invocacionEventSound;
+irrklang::ISound* chaseEventSound;
+irrklang::ISound* fallEventSound;
+irrklang::ISound* demonioEventSound;
+irrklang::ISound* objetosEventSound;
 
 //Sphere cabeza = Sphere(0.5, 20, 20);
 GLfloat deltaTime = 0.0f;
@@ -198,6 +239,27 @@ float angChaser = 0;
 float LightIntensity_E5 = 0.2f;
 float chaserScale = 0.0f;
 
+
+
+/////Variables para evento 6//////
+
+bool isTisa = false;
+float LightIntensity_E6 = 0.2f;
+
+float velPuertas = 0.1f;
+
+float posPuertaZ_1 = 19.178f;
+float posPuertaZ_2 = 14.925f;
+
+float timePuertas = 0;
+
+float rudyang = 0;
+float desplazamientoRudy = 0;
+glm::vec3 posRudy = glm::vec3(-25.377, 2.4696f, 16.487);
+float mioang = 0;
+float desplazamientoMio = 0;
+glm::vec3 posMio = glm::vec3(-25.615, 1.0695, 14.982);
+
 ////////////////
 
 glm::mat4 model(1.0);
@@ -289,6 +351,9 @@ void CreateObjects()
 
 
 }
+
+
+
 
 
 void CreateShaders()
@@ -558,7 +623,21 @@ int evento1(int seq) {
 			posx = 0;
 			posz = 109.15f;
 			posy = -1.3f;
-			vel = 20.0f;
+			vel = 30.0f;
+
+			invocacionEventSound = engine->play3D("Sounds/Invocacion.mp3",
+				irrklang::vec3df(0, 109, 2), true, false, true);
+
+			if (invocacionEventSound)
+				invocacionEventSound->setMinDistance(4.0f);
+
+			demonioEventSound = engine->play3D("Sounds/Demonio.mp3",
+				irrklang::vec3df(posx, posz, posy), true, false, true);
+
+			if (demonioEventSound)
+				demonioEventSound->setMinDistance(3.0f);
+
+			backgroundMusic->stop();
 
 			colorang = 0.0f;
 			lightangpos = 0.0f;
@@ -574,6 +653,8 @@ int evento1(int seq) {
 			model = glm::translate(model, glm::vec3(-posx,
 				posy,
 				posz));
+
+			demonioEventSound->setPosition(irrklang::vec3df(posx, posz, posy));
 
 			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 			glUniform3fv(uniformColor, 1, glm::value_ptr(color));
@@ -616,6 +697,8 @@ int evento1(int seq) {
 				posy,
 				posz));
 
+			demonioEventSound->setPosition(irrklang::vec3df(-posx, posz, posy));
+
 			model = glm::rotate(model, -ang, glm::vec3(0.0f, 1.0f, 0.0f));
 
 			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
@@ -655,6 +738,10 @@ int evento1(int seq) {
 				intensityOni = 0.0;
 				intensityThree = 0.0;
 				intensityFloor = 0.2f;
+				invocacionEventSound->stop();
+				invocacionEventSound->drop();
+				demonioEventSound->stop();
+				backgroundMusic = engine->play2D("Sounds/Fondo.mp3", true, false, true);
 				return -1;
 			}
 			else {
@@ -674,6 +761,12 @@ int evento2(int seq) {
 		posZombie = glm::vec3(-20.604f, 5.3777f, 77.374f);
 		LightIntensity_E2 = 0.0f;
 		timeTamboleo = 0;
+
+		fallEventSound = engine->play3D("Sounds/Fall.mp3",
+			irrklang::vec3df(-23, 77, 2), false, false, true);
+
+		if (fallEventSound)
+			fallEventSound->setMinDistance(5.0f);
 
 		return 1;
 
@@ -708,8 +801,13 @@ int evento3(int seq) {
 	{
 		case 0:
 
+			if (LightIntensitySpotLight_E3 != 0.0f && objetosEventSound) {
+				objetosEventSound->stop();
+			}
+
 			LightIntensity_E3 = 0.2f;
 			LightIntensitySpotLight_E3 = 0.0f;
+
 
 			for (ObjetosFlotantes& f : flotantes) {
 				f.GoTofloor(deltaTime);
@@ -719,6 +817,14 @@ int evento3(int seq) {
 			break;
 
 		case 1:
+
+			if (LightIntensitySpotLight_E3 != 3.0f) {
+				objetosEventSound = engine->play3D("Sounds/Objetos.mp3",
+					irrklang::vec3df(19, 66, 2), true, false, true);
+
+				if (objetosEventSound)
+					objetosEventSound->setMinDistance(3.0f);
+			}
 
 			LightIntensity_E3 = 0.0f;
 			LightIntensitySpotLight_E3 = 3.0f;
@@ -739,6 +845,14 @@ int evento4(int seq) {
 	{
 
 	case 0:
+
+		cofreEventSound = engine->play3D("Sounds/Cofre.mp3",
+			irrklang::vec3df(23,25,2), true, false, true);
+
+		if (cofreEventSound)
+			cofreEventSound->setMinDistance(3.0f);
+
+		backgroundMusic->stop();
 
 		posVodoo = glm::vec3(22.996f, 2.3037f, 25.164f);
 		scaleVodoo = 0.0f;
@@ -853,6 +967,9 @@ int evento4(int seq) {
 			scaleVodoo = 1.0f;
 			DemonLightIntensity_E4 = 0.0f;
 			LightIntensity_E4 = 0.2f;
+			cofreEventSound->stop();
+			cofreEventSound->drop();
+			backgroundMusic = engine->play2D("Sounds/Fondo.mp3", true, false, true);
 			return -1;
 		}
 
@@ -874,6 +991,14 @@ int evento5(int seq) {
 		LightIntensity_E5 = 0.0f;
 		chaserScale = 1.0f;
 
+		chaseEventSound = engine->play3D("Sounds/Chase.mp3",
+			irrklang::vec3df(0, 0, 0), true, false, true);
+
+		if (chaseEventSound)
+			chaseEventSound->setMinDistance(3.0f);
+
+		backgroundMusic->stop();
+
 		return 1;
 
 
@@ -888,7 +1013,7 @@ int evento5(int seq) {
 			desplazamientoChaser += 0.05 * deltaTime;
 		}
 
-		if (chaseTimer > 100) {
+		if (chaseTimer > 200) {
 			return 2;
 		}
 
@@ -907,6 +1032,9 @@ int evento5(int seq) {
 		else {
 			LightIntensity_E5 = 0.2f;
 			chaserScale = 0.0f;
+			chaseEventSound->stop();
+			//chaseEventSound->drop();
+			backgroundMusic = engine->play2D("Sounds/Fondo.mp3", true, false, true);
 			return -1;
 		}
 
@@ -919,10 +1047,197 @@ int evento5(int seq) {
 
 }
 
+int evento6(int seq) {
+
+	switch (seq)
+	{
+	case 0:
+
+		LightIntensity_E6 = 0.0f;
+		timePuertas = 0;
+
+		return 1;
+
+	case 1:
+
+		posPuertaZ_1 -= velPuertas * deltaTime;
+		posPuertaZ_2 += velPuertas * deltaTime;
+
+		if (posPuertaZ_1 <= 17.72f) {
+			posPuertaZ_1 = 17.72f;
+			posPuertaZ_2 = 16.258f;
+			return 2;
+		}
+		else {
+			return 1;
+		}
+		break;
+
+	case 2:
+
+
+		timePuertas += 0.2f * deltaTime;
+
+		if (timePuertas > 50) {
+			isTisa = !isTisa;
+			return 3;
+		}
+		else {
+			return 2;
+		}
+
+		break;
+
+	case 3:
+
+		posPuertaZ_1 += velPuertas * deltaTime;
+		posPuertaZ_2 -= velPuertas * deltaTime;
+
+		if (posPuertaZ_1 >= 19.178f) {
+			posPuertaZ_1 = 19.178f;
+			posPuertaZ_2 = 14.925f;
+			LightIntensity_E6 = 0.2f;
+			return -1;
+		}
+		else {
+			return 3;
+		}
+
+		break;
+
+	}
+
+}
+
+
+bool animacion = false;
+
+
+
+//NEW// Keyframes
+float posXPerro = 8.71f, posYPerro = 1.9, posZPerro = 75.768f;
+float	movPerro_x = 0.0f, movPerro_y = 0.0f, movPerro_z = 0.0f;
+float giroPerro = 0;
+
+#define MAX_FRAMES 9
+int i_max_steps = 400;
+int i_curr_steps = 5;
+typedef struct _frame
+{
+	float movPerro_x;		//Variable para PosicionX
+	float movPerro_y;		//Variable para PosicionY
+	float movPerro_z;		//Variable para PosicionZ
+	float movPerro_xInc;		//Variable para IncrementoX
+	float movPerro_yInc;		//Variable para IncrementoY
+	float movPerro_zInc;		//Variable para IncrementoZ
+	float giroPerro;
+	float giroPerroInc;
+}FRAME;
+
+FRAME KeyFrame[MAX_FRAMES];
+int FrameIndex = 6;			//introducir datos
+bool play = true;
+int playIndex = 0;
+
+
+void resetElements(void)
+{
+
+	movPerro_x = KeyFrame[0].movPerro_x;
+	movPerro_y = KeyFrame[0].movPerro_y;
+	movPerro_z = KeyFrame[0].movPerro_z;
+	giroPerro = KeyFrame[0].giroPerro;
+}
+
+void interpolation(void)
+{
+	KeyFrame[playIndex].movPerro_xInc = (KeyFrame[playIndex + 1].movPerro_x - KeyFrame[playIndex].movPerro_x) / i_max_steps;
+	KeyFrame[playIndex].movPerro_yInc = (KeyFrame[playIndex + 1].movPerro_y - KeyFrame[playIndex].movPerro_y) / i_max_steps;
+	KeyFrame[playIndex].movPerro_zInc = (KeyFrame[playIndex + 1].movPerro_z - KeyFrame[playIndex].movPerro_z) / i_max_steps;
+	KeyFrame[playIndex].giroPerroInc = (KeyFrame[playIndex + 1].giroPerro - KeyFrame[playIndex].giroPerro) / i_max_steps;
+
+}
+
+
+void animate(void)
+{
+	//Movimiento del objeto
+	if (play)
+	{
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			playIndex++;
+			printf("playindex : %d\n", playIndex);
+			if (playIndex > FrameIndex-2)	//end of total animation?
+			{
+				printf("Frame index= %d\n", FrameIndex);
+				printf("termina anim\n");
+				playIndex = 0;
+				resetElements();
+				//play = false;
+			}
+			else //Next frame interpolations
+			{
+				//printf("entro aquí\n");
+				i_curr_steps = 0; //Reset counter
+				//Interpolation
+				interpolation();
+			}
+		}
+		else
+		{
+			//printf("se quedó aqui\n");
+			//printf("max steps: %f", i_max_steps);
+			//Draw animation
+			movPerro_x += KeyFrame[playIndex].movPerro_xInc;
+			movPerro_y += KeyFrame[playIndex].movPerro_yInc;
+			movPerro_z += KeyFrame[playIndex].movPerro_zInc;
+			giroPerro += KeyFrame[playIndex].giroPerroInc;
+			i_curr_steps++;
+		}
+
+	}
+}
+
+/* FIN KEYFRAMES*/
+
 
 
 int main()
 {
+	//KEYFRAMES DECLARADOS INICIALES
+
+	KeyFrame[0].movPerro_x = 0.0f;
+	KeyFrame[0].movPerro_y = 0.0f;
+	KeyFrame[0].movPerro_z = 0.0f;
+	KeyFrame[0].giroPerro = 0;
+
+
+	KeyFrame[1].movPerro_x = 17.42f;//Araco 1
+	KeyFrame[1].movPerro_y = 0.0f;
+	KeyFrame[1].movPerro_z = 19.17f;
+	KeyFrame[1].giroPerro = -45.0f;
+
+
+	KeyFrame[2].movPerro_x = 0.0f;
+	KeyFrame[2].movPerro_y = 0.0f;
+	KeyFrame[2].movPerro_z = 0.0f;
+	KeyFrame[2].giroPerro = 0;
+
+	KeyFrame[3].movPerro_x = 17.42f;//En medio
+	KeyFrame[3].movPerro_y = 0.0f;
+	KeyFrame[3].movPerro_z = -22.436f;
+	KeyFrame[3].giroPerro = -90.0f;
+
+	KeyFrame[4].movPerro_x = 0.0f;
+	KeyFrame[4].movPerro_y = 0.0f;
+	KeyFrame[4].movPerro_z = 0.0f;
+	KeyFrame[4].giroPerro = -270.0f;
+
+	KeyFrame[5].movPerro_x = 17.42f;
+	KeyFrame[5].movPerro_y = 0.0f;
+	KeyFrame[5].movPerro_z = 19.17f;
+	KeyFrame[5].giroPerro = -180.0f;
 
 	srand(time(0));
 
@@ -936,6 +1251,7 @@ int main()
 	eventManager.AddAction(15, 66, 2, &evento3); //Animación de cosas flotantes
 	eventManager.AddEvent(22, 24, &evento4);     //Animación de cofre demoniaco
 	eventManager.AddEvent(-29, 46, &evento5);    //Animación de 
+	eventManager.AddEvent(-14, 15, &evento6);    //Puertas
 
 	CreateObjects();
 	CreateShaders();
@@ -1052,6 +1368,44 @@ int main()
 		flotantes.push_back(ObjetosFlotantes(&objetos[i%6]));
 	}
 
+	toro1 = Toroide(1.6f,0.3f,12,4);
+	toro1.init();
+	toro2 = Toroide(1.6f, 0.3f, 20, 20);
+	toro2.init();
+	toro3 = Toroide(1.6f, 0.3f, 6, 9);
+	toro3.init();
+
+	torop1 = ToroideP(1.6f, 0.3f, 6, 10);
+	torop1.init();
+	torop2 = ToroideP(1.6f, 0.3f, 15, 15);
+	torop2.init();
+	torop3 = ToroideP(1.6f, 0.3f, 7, 13);
+	torop3.init();
+
+	Perro = Model();
+	Perro.LoadModel("Models/Perro.obj");
+
+	Mio = Model();
+	Mio.LoadModel("Models/Mio.obj");
+
+	MioTisa = Model();
+	MioTisa.LoadModel("Models/MioTisa.obj");
+
+
+	Rudy = Model();
+	Rudy.LoadModel("Models/Rudy.obj");
+
+	RudyTisa = Model();
+	RudyTisa.LoadModel("Models/RudyTisa.obj");
+
+	CasaR = Model();
+	CasaR.LoadModel("Models/Casa.obj");
+
+	CasaTisa = Model();
+	CasaTisa.LoadModel("Models/CasaTisa.obj");
+
+	Puerta = Model();
+	Puerta.LoadModel("Models/Puerta.obj");
 
 	ArbolTexture[0] = Texture("Textures/ArbolTexture.png");
 	ArbolTexture[0].LoadTextureA();
@@ -1064,6 +1418,9 @@ int main()
 
 	KanjiTexture = Texture("Textures/OniKanjiTexture.png");
 	KanjiTexture.LoadTextureA();
+
+	KanjisTexture = Texture("Textures/Kanjis.jpg");
+	KanjisTexture.LoadTextureA();
 
 
 	std::vector<std::string> skyboxFaces;
@@ -1190,6 +1547,14 @@ int main()
 
 	/////Pasillo
 	pointLights[14] = PointLight(0.7f, 0.7f, 0.0f,
+		0.2f, 0.2f,
+		2.0f, 1.5f, 1.5f,
+		0.1f, 0.2f, 0.1f);
+	pointLightCount++;
+
+
+	/////Lampara casa
+	pointLights[15] = PointLight(1.0f, 0.7f, 0.0f,
 		0.2f, 0.2f,
 		2.0f, 1.5f, 1.5f,
 		0.1f, 0.2f, 0.1f);
@@ -1345,11 +1710,16 @@ int main()
 		}
 	}
 
+	engine = irrklang::createIrrKlangDevice();
+
+	backgroundMusic =  engine->play2D("Sounds/Fondo.mp3", true, false, true);
+
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
+
 
 		GLfloat now = glfwGetTime();
 		deltaTime = now - lastTime;
@@ -1367,6 +1737,7 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		animate();
 
 		if (day) {
 			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
@@ -1388,6 +1759,9 @@ int main()
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+
+		engine->setListenerPosition(irrklang::vec3df(player.pos.x, player.pos.z, player.pos.y),
+			irrklang::vec3df(0, 0, 1));
 
 		eventManager.Update(mainWindow.getAction(), player.pos);
 
@@ -1586,6 +1960,9 @@ int main()
 		posChaser.x = model[3][0];
 		posChaser.y = model[3][1];
 		posChaser.z = model[3][2];
+
+		if (chaseEventSound)
+			chaseEventSound->setPosition(irrklang::vec3df(posChaser.x, posChaser.z, posChaser.y));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
@@ -2204,6 +2581,226 @@ int main()
 		pointLights[13].SetIntensity(LightIntensity_E2);
 
 
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, posMio);
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		mioang = AngleOf2(glm::vec2(posMio.x, posMio.z), glm::vec2(player.pos.x, player.pos.z));
+
+		model = glm::rotate(model, mioang - (90 * toRadians), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		if (deltaTime > 10) {
+			deltaTime = 0;
+		}
+
+		desplazamientoMio = 0;
+
+
+		if (glm::distance(posMio, player.pos) > 2.0f) {
+			desplazamientoMio = 0.03 * deltaTime;
+		}
+
+		model = glm::translate(model, glm::vec3(-desplazamientoMio, 0.0f, 0.0f));
+
+		if (model[3][0] <= -19.43f && model[3][0] >= -28.553f &&
+			model[3][2] <= 29.39f && model[3][2] >= 12.538f) {
+
+			posMio.x = model[3][0];
+			posMio.y = model[3][1];
+			posMio.z = model[3][2];
+
+		}
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+
+		if (isTisa) {
+			MioTisa.RenderModel();
+		}
+		else {
+			Mio.RenderModel();
+		}
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, posRudy);
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		rudyang = AngleOf2(glm::vec2(posRudy.x, posRudy.z), glm::vec2(player.pos.x, player.pos.z));
+
+		model = glm::rotate(model, rudyang - (90 * toRadians), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		desplazamientoRudy = 0;
+
+
+		if (glm::distance(posRudy, player.pos) > 2.0f) {
+			desplazamientoRudy = 0.03 * deltaTime;
+		}
+
+		model = glm::translate(model, glm::vec3(-desplazamientoRudy, 0.0f, 0.0f));
+
+		if (model[3][0] <= -19.43f && model[3][0] >= -28.553f &&
+			model[3][2] <= 29.39f && model[3][2] >= 12.538f) {
+
+			posRudy.x = model[3][0];
+			posRudy.y = model[3][1];
+			posRudy.z = model[3][2];
+
+		}
+
+
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+
+		if (isTisa) {
+			RudyTisa.RenderModel();
+		}
+		else {
+			Rudy.RenderModel();
+		}
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-22.485f, 0.68648f, 20.834f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		CasaR.RenderModel();
+
+		if (isTisa) {
+			model = glm::mat4(1.0);
+
+			model = glm::translate(model, glm::vec3(-22.485f, 0.74361f, 20.834f));
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+			model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+			glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+			CasaTisa.RenderModel();
+		}
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-15.9f, 2.4867f, posPuertaZ_1));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Puerta.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-15.9f, 2.4867f, posPuertaZ_2));
+		model = glm::scale(model, glm::vec3(-1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Puerta.RenderModel();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-14.0f, 1.0f, 15.0f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		LamparaPapel.RenderModel();
+
+		pointLights[15].SetPos(glm::vec3(modelaux[3][0], modelaux[3][1] + 0.5f, modelaux[3][2]));
+		pointLights[15].SetIntensity(LightIntensity_E6);
+
+
+		//////Toroides
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(8.7185f, 1.68f, 34.161f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		toro1.render();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(8.7185f, 1.68f, 56.597f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		toro2.render();
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(8.7185f, 1.68f, 75.768f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		toro3.render();
+
+		//Derecho
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-8.7185f, 1.68f, 34.161f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		torop3.render();
+
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-8.7185f, 1.68f, 56.597f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		torop2.render();
+		model = glm::mat4(1.0);
+
+		model = glm::translate(model, glm::vec3(-8.7185f, 1.68f, 75.768f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		KanjisTexture.UseTexture();
+		torop1.render();
+
+		//Perro
+		model = glm::mat4(1.0);
+
+		//printf(" %.2f      %.2f          %.2f\n", posXPerro + movPerro_x, posYPerro + movPerro_y, posZPerro + movPerro_z);
+
+		model = glm::translate(model, glm::vec3(posXPerro + movPerro_x, posYPerro + movPerro_y, posZPerro+movPerro_z));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		model = glm::rotate(model, giroPerro * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		Perro.RenderModel();
+		
 
 		glUseProgram(0);
 
